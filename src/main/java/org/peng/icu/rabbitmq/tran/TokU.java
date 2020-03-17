@@ -151,14 +151,12 @@ public class TokU {
 
                 if (flag.equals("MD")){
                     message = new String(protocol.getContent());
+                    System.out.println("--> ↘ " + message);
                 }else if (flag.equals("DD")){
                     String savePath = "out";
                     byte[] filecontext = protocol.getContent();
                     saveFile(filecontext,savePath);
                 }
-
-
-                System.out.println("--> ↘ " + message);
 
                 finalChannel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
             };
