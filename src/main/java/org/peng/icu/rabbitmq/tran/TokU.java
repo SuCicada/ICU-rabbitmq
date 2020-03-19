@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 //import utils.RabbitUtil;
 import org.peng.Parse;
 import org.peng.Protocol;
+import org.peng.icu.rabbitmq.event.DefaultRecListener;
 import org.peng.icu.rabbitmq.utils.RabbitUtil;
 
 import java.io.*;
@@ -14,7 +15,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * @ClassName Send
  * @Date 2020/3/15 17:46
@@ -27,7 +30,7 @@ public class TokU {
     static String recqueueName = RabbitUtil.getrecQueueName();
     static String routingKey = "file.jpg";
 
-    static private void saveFile(byte[] fileByte, String savePath) {
+      @Deprecated  private void saveFile(byte[] fileByte, String savePath) {
         try {
             int FILENAME_SIZE = 1024;
             byte[] f = Arrays.copyOfRange(fileByte, 0, 1024);
@@ -35,7 +38,7 @@ public class TokU {
             String fileName = new String(f, UTF_8).trim();
             System.out.println(fileName);
             File saveDir = new File(savePath);
-            if(!saveDir.exists()){
+            if (!saveDir.exists()) {
                 saveDir.mkdirs();
             }
             FileOutputStream out = new FileOutputStream(new File(savePath + "/" + fileName));
@@ -50,7 +53,7 @@ public class TokU {
     }
 
 
-    static private byte[] getFileBytes(String filePath) {
+    @Deprecated private byte[] getFileBytes(String filePath) {
         File file = new File(filePath);
         try {
             FileInputStream in = new FileInputStream(file);
@@ -78,7 +81,7 @@ public class TokU {
      *
      * @param constr
      */
-    static private void sendMSG(String constr) {
+    @Deprecated private void sendMSG(String constr) {
         Protocol protocol = new Protocol();
         protocol.setFlagmsg("MD".getBytes());
         protocol.setContent(constr.getBytes());
@@ -92,7 +95,7 @@ public class TokU {
      *
      * @param filename
      */
-    static private void sendDOC(String filename) {
+    @Deprecated private void sendDOC(String filename) {
         Protocol protocol = new Protocol();
         byte[] bytefile = getFileBytes(filename);
         protocol.setFlagmsg("DD".getBytes());
@@ -100,10 +103,11 @@ public class TokU {
         send(protocol);
     }
 
-    static private void send(Protocol protocol){
+    @Deprecated private void send(Protocol protocol) {
         send(protocol.toBytes());
     }
-    static private void send(byte[] constr) {
+
+    @Deprecated private void send(byte[] constr) {
         try {
             Channel channel = RabbitUtil.buildChannel();
 
@@ -127,56 +131,11 @@ public class TokU {
     }
 
 
-
-    static private void rec() {
-
-        Channel channel = null;
-        try {
-            channel = RabbitUtil.buildChannel();
-
-            boolean durable = true;
-            channel.queueDeclare(recqueueName, durable, false, false, null);
-
-            Channel finalChannel = channel;
-            DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-                Protocol protocol = null;
-                Parse parse = new Parse();
-                //String message = new String(delivery.getBody(), "UTF-8");
-                byte[] msg = delivery.getBody();
-                parse.setProtos(msg);
-                protocol = parse.check();
-                if  (protocol == null) return;
-                String message = null;
-                String flag = new String(protocol.getFlagmsg());
-
-                if (flag.equals("MD")){
-                    message = new String(protocol.getContent());
-                    System.out.println("--> ↘ " + message);
-                }else if (flag.equals("DD")){
-                    String savePath = "out";
-                    byte[] filecontext = protocol.getContent();
-                    saveFile(filecontext,savePath);
-                }
-
-                finalChannel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-            };
-
-            boolean autoAck = false;
-            channel.basicConsume(
-                    recqueueName,
-                    autoAck,
-                    deliverCallback,
-                    consumerTag -> {
-                        System.out.println("what.........................");
-                    });
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
+    @Deprecated private void rec() {
+        rec(new DefaultRecListener());
     }
 
-    static private void rec(RecListener recListener) {
+    @Deprecated private void rec(RecListener recListener) {
 
         Channel channel = null;
         try {
@@ -193,15 +152,15 @@ public class TokU {
                 byte[] msg = delivery.getBody();
                 parse.setProtos(msg);
                 protocol = parse.check();
-                if  (protocol == null) return;
+                if (protocol == null) return;
                 byte[] message = null;
                 String flag = new String(protocol.getFlagmsg());
 
-                if (flag.equals("MD")){
+                if (flag.equals("MD")) {
                     message = protocol.getContent();
                     //System.out.println("--> ↘ " + message);
                     recListener.msgRec(message);
-                }else if (flag.equals("DD")){
+                } else if (flag.equals("DD")) {
                     String savePath = "out";
                     byte[] filecontext = protocol.getContent();
                     //saveFile(filecontext,savePath);
@@ -225,57 +184,29 @@ public class TokU {
             e.printStackTrace();
         }
     }
-    static private String date(){
+
+    @Deprecated private String date() {
         return new java.text.SimpleDateFormat("yyyy/MM/dd").format(new Date());
     }
 
     public static void main(String[] args) {
-        System.out.printf("rec启动");
-        // 接受
-        new Thread(){
-            @Override
-            public void run(){
-              rec();
-            }
-        }.run();
 
-        System.out.printf("send 启动");
-        // 发送
-        new Thread() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        byte by[] = new byte[10];
-                        System.out.print("> ");
-                        Scanner sc = new Scanner(System.in);
-                        String bbs = sc.nextLine();
-                        System.out.println(bbs);
-                        if (bbs.equals("exit")) {
-                            System.exit(0);
-                            break;
-                        }
-                        String subbbs = "";
-                        String[] subbs = bbs.split(":");
-                        subbbs = subbs[0];
-                        String substr = subbs[1];
-                        if (StringUtils.equals(subbbs, "f") || StringUtils.equals(subbbs, "file")) {
-                            // 发送文档
-                            sendDOC(substr);
-                        } else if (StringUtils.equals(subbbs, "m") || StringUtils.equals(subbbs, "msg")) {
-                            // 发送字符串
-                            sendMSG(substr);
-                        } else if (StringUtils.equals(subbbs, ":file")) {
-                            // 进入发送文档模式
-                        } else if (StringUtils.equals(subbbs, ":message")) {
-                            // 进入字符串聊天模式
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+
+        String userdir = System.getProperties().getProperty("user.dir");
+        System.out.println(userdir);
+
+        if (args.length > 0){
+            String arg = args[0];
+            if (arg.equals("send")){
+                Send.main(new String[]{""});
+            }else if (arg.equals("rec"))
+            {
+                Rec.main(new String[]{""});
             }
-        }.run();
+        }
+
+        System.out.printf("程序启动完成");
+
     }
 }
 

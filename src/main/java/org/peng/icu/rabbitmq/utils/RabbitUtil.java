@@ -4,6 +4,9 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -23,18 +26,22 @@ public class RabbitUtil {
         private static volatile Proper proper = null;
 
         private Proper(Properties p) {
-            if(proper!=null){
+            if (proper != null) {
                 throw new RuntimeException("Use getInstance() method to get the single instance of this class.");
             }
             properties = p;
         }
 
         static public Proper getInstance() {
+            String userdir = System.getProperty("user.dir") + File.separator;
+        //    System.out.println(userdir + "rabbitmq.properties");
+
             if (proper == null) {
                 synchronized (Proper.class) {
-                    InputStream inputStream = ClassLoader.getSystemResourceAsStream("rabbitmq.properties");
-                    properties = new Properties();
                     try {
+                        InputStream inputStream = new FileInputStream(userdir + "rabbitmq.properties");
+                        properties = new Properties();
+
                         properties.load(inputStream);
                         proper = new Proper(properties);
                     } catch (IOException e) {
@@ -74,6 +81,7 @@ public class RabbitUtil {
     static public String getsendQueueName() {
         return getProperties().getProperty("rabbitmq.sendqueueName");
     }
+
     static public String getrecQueueName() {
         return getProperties().getProperty("rabbitmq.recqueueName");
     }

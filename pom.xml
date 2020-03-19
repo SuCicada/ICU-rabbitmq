@@ -6,7 +6,7 @@
 
     <groupId>org.peng</groupId>
     <artifactId>icu-rabbitmq</artifactId>
-    <version>1.0</version>
+    <version>1.0.200319</version>
     <properties>
         <!-- 项目执行脚本目录 -->
         <project.script.execute.directory>src/main/scripts/execute</project.script.execute.directory>
@@ -68,7 +68,7 @@
                     <!--过滤掉不希望包含在jar中的文件-->
                     <excludes>
                         <!-- 排除不需要的文件夹(路径是jar包内部的路径) -->
-                        <exclude>**/assembly/</exclude>
+                        <exclude>rabbitmq.properties</exclude>
                     </excludes>
                 </configuration>
             </plugin>
