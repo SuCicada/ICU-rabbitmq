@@ -208,7 +208,7 @@ public class Send {
                             System.out.println("程序在"+sendqueueName+"通道上发送");
 
                             continue;
-                        }
+                        } 
 
                         if (model == 0){
                             String b = bbs.substring(0,1);
