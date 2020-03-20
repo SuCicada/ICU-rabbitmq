@@ -75,11 +75,11 @@ public class Rec {
         return null;
     }
 
-    static private void rec() {
+    static public void rec() {
         rec(new DefaultRecListener());
     }
 
-    static private void rec(RecListener recListener) {
+    static public void rec(RecListener recListener) {
         try {
             Channel channel = RabbitUtil.buildChannel();
 
@@ -101,7 +101,7 @@ public class Rec {
                     message = protocol.getContent();
                     recListener.msgRec(message);
                 } else if (flag.equals("DD")) {
-                    String savePath = "out";
+                    //String savePath = "out";
                     byte[] filecontext = protocol.getContent();
                     recListener.docRec(filecontext);
                 }

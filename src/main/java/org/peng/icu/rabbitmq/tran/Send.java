@@ -80,7 +80,7 @@ public class Send {
      *
      * @param constr
      */
-    static private void sendMSG(String constr) {
+    static public void sendMSG(String constr) {
         Protocol protocol = new Protocol();
         protocol.setFlagmsg("MD".getBytes());
         protocol.setContent(constr.getBytes());
@@ -94,7 +94,7 @@ public class Send {
      *
      * @param filename
      */
-    static private void sendDOC(String filename) {
+    static public void sendDOC(String filename) {
         Protocol protocol = new Protocol();
         byte[] bytefile = getFileBytes(filename);
         protocol.setFlagmsg("DD".getBytes());
@@ -102,11 +102,11 @@ public class Send {
         send(protocol);
     }
 
-    static private void send(Protocol protocol) {
+    static public void send(Protocol protocol) {
         send(protocol.toBytes());
     }
 
-    static private void send(byte[] constr) {
+    static public void send(byte[] constr) {
         try {
             Channel channel = RabbitUtil.buildChannel();
 
@@ -152,26 +152,77 @@ public class Send {
     }
 
     public static void main(String[] args) {
+
         System.out.printf("send 启动");
         System.out.println("程序在"+sendqueueName+"通道上发送");
+
+
         // 发送
         new Thread() {
+          int model = 0; /// model: 0 综合模式，可以发文字，可以发文档，需要在前面加标记，m： f:
+                         /// 1 单一文本模式，只能发文字信息
+                         /// 2 单一文档模式，只能发文档
+            String[] ps = {">","m:>","f:>"};
+            String[] pss ={"综合模式","文字聊天模式","文档模式"};
+
             @Override
             public void run() {
                 while (true) {
                     try {
                         byte by[] = new byte[10];
-                        System.out.print("> ");
+                        System.out.print(ps[model]);
                         Scanner sc = new Scanner(System.in);
                         String bbs = sc.nextLine();
 
+                        if (bbs.equals("?")){
+                            System.out.println("exit 退出应用");
+                            System.out.println("quit 退出当前模式，返回前综合模式");
+                            System.out.println("file 进入文档模式");
+                            System.out.println("msg  进入文本聊天模式");
+                            continue;
+                        }
                         if (bbs.equals("exit")) {
                             System.exit(0);
                             break;
                         }
-                        String sub1 = "";
+                        if (bbs.equals("quit")) {
+                            if (model > 0) {
+                                model = 0;
+                                System.out.println("现在是"+pss[model]);
+                                System.out.println("程序在"+sendqueueName+"通道上发送");
+                            }else{
+                                System.out.println("不能再退了");
+                            }
+                            continue;
+                        }else if (StringUtils.equals(bbs, "file")) {
+                            // 进入发送文档模式
+                            model = 2;
+                            System.out.println("现在是"+pss[model]);
+                            System.out.println("程序在"+sendqueueName+"通道上发送");
+
+                            continue;
+                        }else if (StringUtils.equals(bbs, "msg")) {
+                            // 进入发送文档模式
+                            model = 1;
+                            System.out.println("现在是"+pss[model]);
+                            System.out.println("程序在"+sendqueueName+"通道上发送");
+
+                            continue;
+                        }
+
+                        if (model == 0){
+                            String b = bbs.substring(0,1);
+                            if (!"mf".contains(b)){
+                                System.out.println("文本错误，缺少标记");
+                                continue;
+                            }
+                        }else if (model == 1){
+                            bbs = "m:" + bbs;
+                        }else if (model == 2){
+                            bbs = "f:" + bbs;
+                        }
                         String[] subbs = bbs.split(":");
-                        sub1 = subbs[0];
+                        String sub1 = subbs[0];
                         String sub2 = subbs[1];
                         if (StringUtils.equals(sub1, "f") || StringUtils.equals(sub1, "file")) {
                             // 发送文档
@@ -179,10 +230,6 @@ public class Send {
                         } else if (StringUtils.equals(sub1, "m") || StringUtils.equals(sub1, "msg")) {
                             // 发送字符串
                             sendMSG(sub2);
-                        } else if (StringUtils.equals(sub1, ":file")) {
-                            // 进入发送文档模式
-                        } else if (StringUtils.equals(sub1, ":message")) {
-                            // 进入字符串聊天模式
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
