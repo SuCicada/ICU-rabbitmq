@@ -1,22 +1,9 @@
 package org.peng.icu.rabbitmq.tran;
 
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.DeliverCallback;
-import com.rabbitmq.client.MessageProperties;
-import org.apache.commons.lang3.StringUtils;
 //import utils.RabbitUtil;
-import org.peng.Parse;
-import org.peng.Protocol;
-import org.peng.icu.rabbitmq.event.DefaultRecListener;
-import org.peng.icu.rabbitmq.utils.RabbitUtil;
 
-import java.io.*;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Scanner;
-import java.util.concurrent.TimeoutException;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import org.peng.icu.rabbitmq.face.ICUform;
 
 /**
  * @ClassName Send
@@ -24,13 +11,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @Author pengyifu
  */
 public class TokU {
-    static String EXCHANGE_NAME = "logs.topic";
+    /*static String EXCHANGE_NAME = "logs.topic";
     static String TYPE = "topic";
     static String sendqueueName = RabbitUtil.getsendQueueName();
     static String recqueueName = RabbitUtil.getrecQueueName();
     static String routingKey = "file.jpg";
-
-      @Deprecated  private void saveFile(byte[] fileByte, String savePath) {
+*/
+     /* @Deprecated  private void saveFile(byte[] fileByte, String savePath) {
         try {
             int FILENAME_SIZE = 1024;
             byte[] f = Arrays.copyOfRange(fileByte, 0, 1024);
@@ -50,10 +37,10 @@ public class TokU {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
 
-    @Deprecated private byte[] getFileBytes(String filePath) {
+    /*@Deprecated private byte[] getFileBytes(String filePath) {
         File file = new File(filePath);
         try {
             FileInputStream in = new FileInputStream(file);
@@ -74,40 +61,40 @@ public class TokU {
             e.printStackTrace();
         }
         return null;
-    }
+    }*/
 
     /**
      * 发送文本字符串
      *
      * @param constr
      */
-    @Deprecated private void sendMSG(String constr) {
+    /*@Deprecated private void sendMSG(String constr) {
         Protocol protocol = new Protocol();
         protocol.setFlagmsg("MD".getBytes());
         protocol.setContent(constr.getBytes());
 
         //send(constr.getBytes());
         send(protocol);
-    }
+    }*/
 
     /**
      * 发送文档对象
      *
-     * @param filename
+     * @param
      */
-    @Deprecated private void sendDOC(String filename) {
+    /*@Deprecated private void sendDOC(String filename) {
         Protocol protocol = new Protocol();
         byte[] bytefile = getFileBytes(filename);
         protocol.setFlagmsg("DD".getBytes());
         protocol.setContent(bytefile);
         send(protocol);
-    }
+    }*/
 
-    @Deprecated private void send(Protocol protocol) {
+    /*@Deprecated private void send(Protocol protocol) {
         send(protocol.toBytes());
     }
-
-    @Deprecated private void send(byte[] constr) {
+*/
+    /*@Deprecated private void send(byte[] constr) {
         try {
             Channel channel = RabbitUtil.buildChannel();
 
@@ -128,14 +115,14 @@ public class TokU {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-    }
+    }*/
 
 
-    @Deprecated private void rec() {
+    /*@Deprecated private void rec() {
         rec(new DefaultRecListener());
     }
-
-    @Deprecated private void rec(RecListener recListener) {
+*/
+    /*@Deprecated private void rec(RecListener recListener) {
 
         Channel channel = null;
         try {
@@ -183,11 +170,11 @@ public class TokU {
         } catch (TimeoutException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
-    @Deprecated private String date() {
+    /*@Deprecated private String date() {
         return new java.text.SimpleDateFormat("yyyy/MM/dd").format(new Date());
-    }
+    }*/
 
     public static void main(String[] args) {
 
@@ -202,11 +189,12 @@ public class TokU {
             }else if (arg.equals("rec"))
             {
                 Rec.main(new String[]{""});
+            }else if (arg.equals("face")){
+                ICUform.main(args);
             }
+        }else{
+            System.out.println("命令行参数: send rec form");
         }
-
-        System.out.printf("程序启动完成");
-
     }
 }
 
