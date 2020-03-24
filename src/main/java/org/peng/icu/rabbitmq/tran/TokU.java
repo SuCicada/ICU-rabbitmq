@@ -3,8 +3,6 @@ package org.peng.icu.rabbitmq.tran;
 //import utils.RabbitUtil;
 
 
-import org.peng.icu.rabbitmq.face.ICUform;
-
 /**
  * @ClassName Send
  * @Date 2020/3/15 17:46
@@ -189,8 +187,6 @@ public class TokU {
             }else if (arg.equals("rec"))
             {
                 Rec.main(new String[]{""});
-            }else if (arg.equals("face")){
-                ICUform.main(args);
             }
         }else{
             System.out.println("命令行参数: send rec form");

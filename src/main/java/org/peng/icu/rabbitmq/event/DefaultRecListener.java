@@ -11,21 +11,25 @@ import java.util.Arrays;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class DefaultRecListener implements RecListener {
-    private void saveFile(byte[] fileByte, String savePath) {
+    private void saveFile(byte[] fileByte, String savePath, String filename) {
         try {
-            int FILENAME_SIZE = 1024;
-            byte[] f = Arrays.copyOfRange(fileByte, 0, 1024);
-            byte[] fileData = Arrays.copyOfRange(fileByte, 1024, fileByte.length);
-            String fileName = new String(f, UTF_8).trim();
-            System.out.println(fileName);
+            byte[] fileData = fileByte;
+            String fileName = filename;
+            if (fileName == null) {
+                fileName = System.currentTimeMillis() + "noName";
+                System.out.println("收到一个没有名称的文档,随机命名为: " + fileName);
+            } else {
+                System.out.println("收到一个文档 : " + fileName);
+            }
             File saveDir = new File(savePath);
-            if(!saveDir.exists()){
+            if (!saveDir.exists()) {
                 saveDir.mkdirs();
             }
             FileOutputStream out = new FileOutputStream(new File(savePath + "/" + fileName));
 
             out.write(fileData);
             out.close();
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -39,8 +43,8 @@ public class DefaultRecListener implements RecListener {
     }
 
     @Override
-    public void docRec(byte[] doc) {
+    public void docRec(byte[] doc, String filename) {
         String savePath = "out";
-        saveFile(doc,savePath);
+        saveFile(doc, savePath, filename);
     }
 }

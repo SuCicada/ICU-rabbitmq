@@ -103,7 +103,8 @@ public class Rec {
                 } else if (flag.equals("DD")) {
                     //String savePath = "out";
                     byte[] filecontext = protocol.getContent();
-                    recListener.docRec(filecontext);
+                    byte[] filename = protocol.getFileName();
+                    recListener.docRec(filecontext, new String(filename));
                 }
                 channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 
@@ -121,57 +122,13 @@ public class Rec {
             ex.printStackTrace();
         }
     }
-//
-//        Channel channel = null;
-//        try {
-//            channel = RabbitUtil.buildChannel();
-//
-//            boolean durable = true;
-//            channel.queueDeclare(recqueueName, durable, false, false, null);
-//
-//            Channel finalChannel = channel;
-//            DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-//                Protocol protocol = null;
-//                Parse parse = new Parse();
-//                //String message = new String(delivery.getBody(), "UTF-8");
-//                byte[] msg = delivery.getBody();
-//                parse.setProtos(msg);
-//                protocol = parse.check();
-//                if (protocol == null) return;
-//                byte[] message = null;
-//                String flag = new String(protocol.getFlagmsg());
-//
-//                if (flag.equals("MD")) {
-//                    message = protocol.getContent();
-//                    //System.out.println("--> ↘ " + message);
-//                    recListener.msgRec(message);
-//                } else if (flag.equals("DD")) {
-//                    String savePath = "out";
-//                    byte[] filecontext = protocol.getContent();
-//                    //saveFile(filecontext,savePath);
-//                    recListener.docRec(filecontext);
-//                }
-//
-//                finalChannel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-//            };
-//
-//            boolean autoAck = false;
-//            channel.basicConsume(
-//                    recqueueName,
-//                    autoAck,
-//                    deliverCallback,
-//                    consumerTag -> {
-//                        System.out.println("what.........................");
-//                    });
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (TimeoutException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     static private String date() {
         return new java.text.SimpleDateFormat("yyyy/MM/dd").format(new Date());
+    }
+
+    public static String getRecqueueName() {
+        return recqueueName;
     }
 
     public static void main(String[] args) {
@@ -183,13 +140,15 @@ public class Rec {
             @Override
             public void run() {
                 try {
-                    byte by[] = new byte[10];
-                    System.out.print("> ");
-                    Scanner sc = new Scanner(System.in);
-                    String bbs = sc.nextLine();
+                    while (true) {
+                        byte by[] = new byte[10];
+                        System.out.print("> ");
+                        Scanner sc = new Scanner(System.in);
+                        String bbs = sc.nextLine();
 
-                    if (bbs.equals("exit")) {
-                        System.exit(0);
+                        if (bbs.equals("exit")) {
+                            System.exit(0);
+                        }
                     }
 
                 } catch (Exception e) {
