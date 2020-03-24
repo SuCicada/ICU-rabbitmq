@@ -1,0 +1,15 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="icu-rabbitmq:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/icu_rabbitmq_jar</output-path>
+    <root id="archive" name="icu-rabbitmq.jar">
+      <element id="module-output" name="icu-rabbitmq" />
+      <element id="library" level="project" name="Maven: commons-lang:commons-lang:2.6" />
+      <element id="library" level="project" name="Maven: org.apache.commons:commons-lang3:3.9" />
+      <element id="library" level="project" name="Maven: log4j:log4j:1.2.17" />
+      <element id="library" level="project" name="Maven: com.rabbitmq:amqp-client:5.6.0" />
+      <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.25" />
+      <element id="library" level="project" name="Maven: org.slf4j:slf4j-log4j12:1.7.5" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/java/org/peng/icu/rabbitmq/face/ICUform.form" />
+    </root>
+  </artifact>
+</component>
