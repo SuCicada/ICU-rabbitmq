@@ -16,7 +16,7 @@ public class Protocol {
     private final byte[] flaghead = {'$', '$', 'I', 'C', 'U', '0', '0', '2'};
     private byte[] flagmsg = new byte[]{' ',' '};
     private byte[] dataLen = new byte[]{' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
-    private byte[] fileName = new byte[]{' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
+    private byte[] fileName = new byte[]{' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '}; // 16
     private byte[] content;
     private byte[] user = new byte[]{' ',' ',' ',' ',' ',' ',' ',' '};
     private byte[] pwd = new byte[]{' ',' ',' ',' ',' ',' ',' ',' '};
@@ -61,7 +61,14 @@ public class Protocol {
     }
 
     public void setFileName(byte[] fileName) {
-        this.fileName = fileName;
+        if (fileName.length != 16){
+            byte[] filename2 = new byte[]{' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};//16
+            System.arraycopy(fileName,0,filename2,0,fileName.length);
+            this.fileName = filename2;
+        }else{
+            this.fileName = fileName;
+        }
+
     }
 
     public byte[] getContent() {

@@ -92,5 +92,4 @@ public class Parse {
         this.protos = protos;
     }
 
-
 }
